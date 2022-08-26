@@ -7,5 +7,8 @@ class Task:
         elif name == "crop-delineation":
             self.mean = [0.238, 0.297, 0.317]
             self.std = [0.187, 0.123, 0.114]
+        elif name == "building":
+            self.mean = [0.406, 0.428, 0.394]
+            self.std = [0.201, 0.183, 0.176]
         else:
             raise NotImplementedError("Task not implemented")

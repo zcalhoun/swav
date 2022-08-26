@@ -77,13 +77,20 @@ parser.add_argument(
 parser.add_argument(
     "--task",
     type=str,
-    choices=["solar", "crop-delineation"],
+    choices=["solar", "crop-delineation", "building"],
     help="Choose the task that you are training on.",
 )
 
 #########################
 ## swav specific params #
 #########################
+parser.add_argument(
+    "--initialize_imagenet",
+    type=bool_flag,
+    default=True,
+    help="Whether to initialize with imagenet weights",
+)
+
 parser.add_argument(
     "--crops_for_assign",
     type=int,
@@ -183,6 +190,14 @@ parser.add_argument(
     help="this argument is not used and should be ignored",
 )
 
+parser.add_argument(
+    "--restrict_gpus",
+    default=[0, 1, 2, 3, 4, 5, 6, 7],
+    type=int,
+    nargs="+",
+    help="Specify the GPUs to restrict processing to."
+)
+
 #########################
 #### other parameters ###
 #########################
@@ -258,17 +273,21 @@ def main():
         nmb_prototypes=args.nmb_prototypes,
     )
 
-    # Load the pre-trained model weights on top.
-    new_state_dict = model.state_dict()
+    if args.initialize_imagenet:    
+        logger.info("Initializing with ImageNet weights.")
+        # Load the pre-trained model weights on top.
+        new_state_dict = model.state_dict()
 
-    # Load weights, and remove bias and weights.
-    state_dict = torch.hub.load("facebookresearch/swav:main", "resnet50").state_dict()
-    state_dict.pop("fc.bias")
-    state_dict.pop("fc.weight")
+        # Load weights, and remove bias and weights.
+        state_dict = torch.hub.load("facebookresearch/swav:main", "resnet50").state_dict()
+        state_dict.pop("fc.bias")
+        state_dict.pop("fc.weight")
 
-    # Update the new state dict with the old state dict
-    new_state_dict.update(state_dict)
-    model.load_state_dict(new_state_dict)
+        # Update the new state dict with the old state dict
+        new_state_dict.update(state_dict)
+        model.load_state_dict(new_state_dict)
+    else:
+        logger.info("Not initializing with ImageNet weights.")
 
     # synchronize batch norm layers
     if args.sync_bn == "pytorch":

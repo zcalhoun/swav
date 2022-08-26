@@ -51,7 +51,7 @@ class MultiCropDataset(datasets.ImageFolder):
                     transforms.Compose(
                         [
                             randomresizedcrop,
-                            transforms.RandomHorizontalFlip(p=0.5),
+                            # transforms.RandomHorizontalFlip(p=0.5),
                             transforms.Compose(color_transform),
                             transforms.ToTensor(),
                             transforms.Normalize(mean=mean, std=std),

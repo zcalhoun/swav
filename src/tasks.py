@@ -1,0 +1,14 @@
+# This file holds the mean and standard deviation for each task
+class Task:
+    def __init__(self, name):
+        if name == "solar":
+            self.mean = [0.507, 0.513, 0.462]
+            self.std = [0.172, 0.133, 0.114]
+        elif name == "crop-delineation":
+            self.mean = [0.238, 0.297, 0.317]
+            self.std = [0.187, 0.123, 0.114]
+        elif name == "building":
+            self.mean = [0.406, 0.428, 0.394]
+            self.std = [0.201, 0.183, 0.176]
+        else:
+            raise NotImplementedError("Task not implemented")

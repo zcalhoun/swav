@@ -73,6 +73,19 @@ We provide the running times for some of our runs:
 - [Apex](https://github.com/NVIDIA/apex) with CUDA extension (see [how I installed apex](https://github.com/facebookresearch/swav/issues/18#issuecomment-748123838))
 - Other dependencies: scipy, pandas, numpy
 
+### Method that works for us to install apex
+
+```bash
+git clone "https://github.com/NVIDIA/apex"
+cd apex
+git checkout 4a1aa97e31ca87514e17c3cd3bbc03f4204579d0
+pip install -v --disable-pip-version-check --no-cache-dir ./
+
+python -c 'import apex; from apex.parallel import LARC' # should run and return nothing
+python -c 'import apex; from apex.parallel import SyncBatchNorm; print(SyncBatchNorm.__module__)' # should run and return apex.parallel.optimized_sync_batchnorm
+```
+
+
 ## Singlenode training
 SwAV is very simple to implement and experiment with.
 Our implementation consists in a [main_swav.py](./main_swav.py) file from which are imported the dataset definition [src/multicropdataset.py](./src/multicropdataset.py), the model architecture [src/resnet50.py](./src/resnet50.py) and some miscellaneous training utilities [src/utils.py](./src/utils.py).

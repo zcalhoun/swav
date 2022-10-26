@@ -1,7 +1,7 @@
 # Fork of the SwAV repository
 This repository was forked from the original repository as part of our work to show that "Self-supervised encoders are better transfer learners in remote sensing applications" (pending publication...link forthcoming).
 
-Please see the original repository (here)[https://github.com/facebookresearch/swav], and the original paper [here](https://arxiv.org/abs/2006.09882).
+Please see the original repository [here](https://github.com/facebookresearch/swav), and the original paper [here](https://arxiv.org/abs/2006.09882).
 
 This fork was created to make minor changes to the original code so that we could run trials initializing SwAV using the ImageNet weights, versus training from scratch. Our assumption was the pre-training on remote sensing data would be improved if it was first pre-trained on ImageNet, as suggested by this paper [Self-supervised prettraining improves self-supervised pretraining](https://arxiv.org/abs/2103.12718).
 

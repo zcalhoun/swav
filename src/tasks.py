@@ -10,5 +10,8 @@ class Task:
         elif name == "building":
             self.mean = [0.406, 0.428, 0.394]
             self.std = [0.201, 0.183, 0.176]
+        elif name == "climate+":
+            self.mean = [0.460, 0.440, 0.378]
+            self.std = [0.179, 0.139, 0.123]
         else:
             raise NotImplementedError("Task not implemented")

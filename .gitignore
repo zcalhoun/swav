@@ -1,2 +1,8 @@
 */__pycache__/
+bin
 experiments
+wandb
+*.pkl
+*.pth
+*.tar
+*.log

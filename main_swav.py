@@ -21,6 +21,7 @@ import torch.distributed as dist
 import torch.optim
 import apex
 from apex.parallel.LARC import LARC
+import wandb
 
 from src.utils import (
     bool_flag,
@@ -77,7 +78,8 @@ parser.add_argument(
 parser.add_argument(
     "--task",
     type=str,
-    choices=["solar", "crop-delineation", "building"],
+    required=False,
+    #choices=["solar", "crop-delineation", "building"],
     help="Choose the task that you are training on.",
 )
 
@@ -342,15 +344,21 @@ def main():
     model = nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu_to_work_on])
 
     # optionally resume from a checkpoint
-    to_restore = {"epoch": 0}
+    to_restore = {"epoch": 0, "learning_rate": args.base_lr}
     restart_from_checkpoint(
         os.path.join(args.dump_path, "checkpoint.pth.tar"),
         run_variables=to_restore,
         state_dict=model,
         optimizer=optimizer,
+
         amp=apex.amp,
     )
     start_epoch = to_restore["epoch"]
+    learning_rate = to_restore["learning_rate"]
+    if learning_rate != args.base_lr:
+        for param_group in optimizer.param_groups:
+            param_group['lr'] = learning_rate
+    
 
     # build the queue
     queue = None
@@ -362,6 +370,16 @@ def main():
 
     cudnn.benchmark = True
 
+    wandb.init(project="swav-climate+", entity="bass-connections-22-23")
+    config = {"training size":len(train_dataset),
+              "learning_rate":learning_rate,
+              "weight_decay": args.wd ,
+              "epochs": args.epochs,
+              "batch_size":args.batch_size
+              }
+    wandb.config = config
+    wandb.watch(model, log="all")
+     
     for epoch in range(start_epoch, args.epochs):
 
         # train the network for one epoch
@@ -388,6 +406,7 @@ def main():
                 "epoch": epoch + 1,
                 "state_dict": model.state_dict(),
                 "optimizer": optimizer.state_dict(),
+                "learning_rate": optimizer.optim.param_groups[0]["lr"]
             }
             if args.use_fp16:
                 save_dict["amp"] = apex.amp.state_dict()
@@ -496,6 +515,11 @@ def train(train_loader, model, optimizer, epoch, lr_schedule, queue):
                     lr=optimizer.optim.param_groups[0]["lr"],
                 )
             )
+            wandb.log({
+                "epoch": epoch,
+                "loss": losses.avg,
+                "lr": optimizer.optim.param_groups[0]["lr"]
+            })
     return (epoch, losses.avg), queue
 
 

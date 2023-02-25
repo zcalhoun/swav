@@ -35,13 +35,17 @@ class MultiCropDataset(datasets.ImageFolder):
         if size_dataset >= 0:
             self.samples = self.samples[:size_dataset]
         self.return_index = return_index
-
         color_transform = [get_color_distortion(), PILRandomGaussianBlur()]
 
-        task = Task(task)
-        mean = task.mean
-        std = task.std
+        if task:
+            task = Task(task)
+            mean = task.mean
+            std = task.std
+        else:
+            mean = [0.485, 0.456, 0.406]  
+            std = [0.229, 0.224, 0.225]
         trans = []
+
         for i in range(len(size_crops)):
             randomresizedcrop = transforms.RandomResizedCrop(
                 size_crops[i], scale=(min_scale_crops[i], max_scale_crops[i]),

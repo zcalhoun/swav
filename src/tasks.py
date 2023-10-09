@@ -13,5 +13,11 @@ class Task:
         elif name == "climate+":
             self.mean = [0.460, 0.440, 0.378]
             self.std = [0.179, 0.139, 0.123]
+        elif name == "imagenet":
+            self.mean = [0.485, 0.456, 0.406]
+            self.std = [0.229, 0.224, 0.225]
+        elif name == "geonet_1M_checked": 
+            self.mean = [0.309, 0.285, 0.227]
+            self.std = [0.241, 0.204, 0.199]
         else:
             raise NotImplementedError("Task not implemented")

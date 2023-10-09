@@ -92,7 +92,18 @@ parser.add_argument(
     default=True,
     help="Whether to initialize with imagenet weights",
 )
-
+parser.add_argument(
+    "--initialize_pretrained",
+    type=bool_flag,
+    default=True,
+    help="Whether to initialize with a pretrained model's weights",
+)
+parser.add_argument(
+    "--pretrained_path",
+    type=str,
+    default="/path/to/pretrained",
+    help="path to pretrained model",
+)
 parser.add_argument(
     "--crops_for_assign",
     type=int,
@@ -204,6 +215,9 @@ parser.add_argument(
 #### other parameters ###
 #########################
 parser.add_argument("--arch", default="resnet50", type=str, help="convnet architecture")
+
+parser.add_argument("--project", default="swav", type=str, help="wandb project name")
+
 parser.add_argument(
     "--hidden_mlp",
     default=2048,
@@ -291,6 +305,26 @@ def main():
     else:
         logger.info("Not initializing with ImageNet weights.")
 
+    if args.initialize_pretrained:
+        logger.info("Initializing with pretrained model.")
+        # Load the pre-trained model weights on top.
+        new_state_dict = model.state_dict()
+        # Load weights, and remove bias and weights.
+        state_dict = torch.load(args.pretrained_path)
+        if "state_dict" in state_dict:
+            state_dict = state_dict["state_dict"]
+        # remove prefixe "module."
+        state_dict = {k.replace("module.", ""): v for k, v in state_dict.items()}
+        for k, v in model.state_dict().items():
+            if k not in list(state_dict):
+                logger.info('key "{}" could not be found in provided state dict'.format(k))
+            elif state_dict[k].shape != v.shape:
+                logger.info('key "{}" is of different shape in model and provided state dict'.format(k))
+                state_dict[k] = v
+        new_state_dict.update(state_dict)
+        msg = model.load_state_dict(new_state_dict, strict=False)
+        logger.info("Load pretrained model with msg: {}".format(msg))
+
     # synchronize batch norm layers
     if args.sync_bn == "pytorch":
         model = nn.SyncBatchNorm.convert_sync_batchnorm(model)
@@ -370,7 +404,7 @@ def main():
 
     cudnn.benchmark = True
 
-    wandb.init(project="swav-climate+", entity="bass-connections-22-23")
+    wandb.init(project=args.project, entity="bass-connections-22-23")
     config = {"training size":len(train_dataset),
               "learning_rate":learning_rate,
               "weight_decay": args.wd ,

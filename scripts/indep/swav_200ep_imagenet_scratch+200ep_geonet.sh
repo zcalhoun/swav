@@ -2,7 +2,7 @@
 
 DATASET_PATH="/scratch/sl636/checked_image/"
 EXPERIMENT_PATH="./experiments/indep/swav/imagenet_from_scratch_200+geonet_200/"
-PRETRAINED_PATH="/home/sl636/swav/experiments/indep/swav/imagenet_from_scratch_400/checkpoints/ckp-399.pth"
+PRETRAINED_PATH="./experiments/indep/swav/imagenet_from_scratch_200/checkpoints/ckp-199.pth"
 
 mkdir -p $EXPERIMENT_PATH
 

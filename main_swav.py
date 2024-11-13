@@ -19,8 +19,8 @@ import torch.nn.parallel
 import torch.backends.cudnn as cudnn
 import torch.distributed as dist
 import torch.optim
-import apex
-from apex.parallel.LARC import LARC
+#import apex
+#from apex.parallel.LARC import LARC
 import wandb
 
 from src.utils import (
@@ -328,13 +328,13 @@ def main():
     # synchronize batch norm layers
     if args.sync_bn == "pytorch":
         model = nn.SyncBatchNorm.convert_sync_batchnorm(model)
-    elif args.sync_bn == "apex":
-        # with apex syncbn we sync bn per group because it speeds up computation
-        # compared to global syncbn
-        process_group = apex.parallel.create_syncbn_process_group(
-            args.syncbn_process_group_size
-        )
-        model = apex.parallel.convert_syncbn_model(model, process_group=process_group)
+    # elif args.sync_bn == "apex":
+    #     # with apex syncbn we sync bn per group because it speeds up computation
+    #     # compared to global syncbn
+    #     process_group = apex.parallel.create_syncbn_process_group(
+    #         args.syncbn_process_group_size
+    #     )
+    #     model = apex.parallel.convert_syncbn_model(model, process_group=process_group)
     # copy model to GPU
     model = model.cuda()
     if args.rank == 0:
@@ -345,7 +345,7 @@ def main():
     optimizer = torch.optim.SGD(
         model.parameters(), lr=args.base_lr, momentum=0.9, weight_decay=args.wd,
     )
-    optimizer = LARC(optimizer=optimizer, trust_coefficient=0.001, clip=False)
+    #optimizer = LARC(optimizer=optimizer, trust_coefficient=0.001, clip=False)
     warmup_lr_schedule = np.linspace(
         args.start_warmup, args.base_lr, len(train_loader) * args.warmup_epochs
     )
@@ -370,9 +370,9 @@ def main():
     logger.info("Building optimizer done.")
 
     # init mixed precision
-    if args.use_fp16:
-        model, optimizer = apex.amp.initialize(model, optimizer, opt_level="O1")
-        logger.info("Initializing mixed precision done.")
+    # if args.use_fp16:
+    #     model, optimizer = apex.amp.initialize(model, optimizer, opt_level="O1")
+    #     logger.info("Initializing mixed precision done.")
 
     # wrap model
     model = nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu_to_work_on])
@@ -385,7 +385,7 @@ def main():
         state_dict=model,
         optimizer=optimizer,
 
-        amp=apex.amp,
+    #    amp=apex.amp,
     )
     start_epoch = to_restore["epoch"]
     learning_rate = to_restore["learning_rate"]
@@ -442,8 +442,8 @@ def main():
                 "optimizer": optimizer.state_dict(),
                 "learning_rate": optimizer.optim.param_groups[0]["lr"]
             }
-            if args.use_fp16:
-                save_dict["amp"] = apex.amp.state_dict()
+            #if args.use_fp16:
+            #    save_dict["amp"] = apex.amp.state_dict()
             torch.save(
                 save_dict, os.path.join(args.dump_path, "checkpoint.pth.tar"),
             )
@@ -519,9 +519,9 @@ def train(train_loader, model, optimizer, epoch, lr_schedule, queue):
         # ============ backward and optim step ... ============
         optimizer.zero_grad()
         if args.use_fp16:
-            with apex.amp.scale_loss(loss, optimizer) as scaled_loss:
-                scaled_loss.backward()
-        else:
+            #with apex.amp.scale_loss(loss, optimizer) as scaled_loss:
+            #    scaled_loss.backward()
+        #else:
             loss.backward()
         # cancel gradients for the prototypes
         if iteration < args.freeze_prototypes_niters:
@@ -546,13 +546,13 @@ def train(train_loader, model, optimizer, epoch, lr_schedule, queue):
                     batch_time=batch_time,
                     data_time=data_time,
                     loss=losses,
-                    lr=optimizer.optim.param_groups[0]["lr"],
+                    lr=optimizer.param_groups[0]["lr"],
                 )
             )
             wandb.log({
                 "epoch": epoch,
                 "loss": losses.avg,
-                "lr": optimizer.optim.param_groups[0]["lr"]
+                "lr": optimizer.param_groups[0]["lr"]
             })
     return (epoch, losses.avg), queue
 

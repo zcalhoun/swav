@@ -1,15 +1,15 @@
 #!/bin/bash
 
-DATASET_PATH="/scratch/sl636/checked_image/"
-EXPERIMENT_PATH="./experiments/indep/swav/geonet_from_scratch_400/"
+DATASET_PATH="/scratch/seco_1m/"
+EXPERIMENT_PATH="./experiments/indep/swav/seco_from_scratch_400/"
 
 mkdir -p $EXPERIMENT_PATH
 
 python -m torch.distributed.launch --nproc_per_node=8 main_swav.py \
 --data_path $DATASET_PATH \
---task geonet_1M_checked \
+--task seco \
 --initialize_imagenet false \
---project geonet_from_scratch \
+--project seco_from_scratch \
 --nmb_crops 2 6 \
 --size_crops 224 96 \
 --min_scale_crops 0.14 0.05 \

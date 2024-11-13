@@ -87,6 +87,14 @@ parser.add_argument("--rank", default=0, type=int, help="""rank of this process:
 parser.add_argument("--local_rank", default=0, type=int,
                     help="this argument is not used and should be ignored")
 
+parser.add_argument(
+    "--restrict_gpus",
+    default=[0, 1, 2, 3, 4, 5, 6, 7],
+    type=int,
+    nargs="+",
+    help="Specify the GPUs to restrict processing to."
+)
+
 
 def main():
     global args, best_acc

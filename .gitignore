@@ -6,3 +6,8 @@ wandb
 *.pth
 *.tar
 *.log
+*.txt
+tasks/
+models/
+datasets/
+__pycache__

@@ -289,6 +289,10 @@ def main():
         nmb_prototypes=args.nmb_prototypes,
     )
 
+    for name, param in model.named_parameters():
+        if "projection" not in name and "prototypes" not in name:
+            param.requires_grad = False
+
     if args.initialize_imagenet:    
         logger.info("Initializing with ImageNet weights.")
         # Load the pre-trained model weights on top.
@@ -465,6 +469,7 @@ def train(train_loader, model, optimizer, epoch, lr_schedule, queue):
     use_the_queue = False
 
     end = time.time()
+
     for it, inputs in enumerate(train_loader):
         # measure data loading time
         data_time.update(time.time() - end)
@@ -554,6 +559,7 @@ def train(train_loader, model, optimizer, epoch, lr_schedule, queue):
                 "loss": losses.avg,
                 "lr": optimizer.optim.param_groups[0]["lr"]
             })
+            
     return (epoch, losses.avg), queue
 
 

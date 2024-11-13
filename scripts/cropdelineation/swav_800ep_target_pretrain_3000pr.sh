@@ -1,10 +1,10 @@
 #!/bin/bash
 
-DATASET_PATH="/scratch/zdc6/data/building/"
-EXPERIMENT_PATH="./experiments/building/swav_800ep_pretrain_test"
+DATASET_PATH="/scratch/zdc6/data/crop_delineation"
+EXPERIMENT_PATH="./experiments/cropdelineation/swav_800ep_target_pretrain_3000pr"
 mkdir -p $EXPERIMENT_PATH
 
-python -m torch.distributed.launch --nproc_per_node=4 main_swav.py \
+python -m torch.distributed.launch --nproc_per_node=8 main_swav.py \
 --data_path $DATASET_PATH \
 --nmb_crops 2 6 \
 --size_crops 160 96 \
@@ -12,10 +12,10 @@ python -m torch.distributed.launch --nproc_per_node=4 main_swav.py \
 --max_scale_crops 1. 0.14 \
 --crops_for_assign 0 1 \
 --temperature 0.1 \
---epsilon 0.05 \
+--epsilon 0.03 \
 --sinkhorn_iterations 3 \
 --feat_dim 128 \
---nmb_prototypes 100 \
+--nmb_prototypes 3000 \
 --queue_length 0 \
 --epochs 800 \
 --batch_size 64 \
@@ -25,5 +25,6 @@ python -m torch.distributed.launch --nproc_per_node=4 main_swav.py \
 --warmup_epochs 0 \
 --arch resnet50 \
 --use_fp16 true \
---task building \
+--initialize_imagenet false \
+--task crop-delineation \
 --dump_path $EXPERIMENT_PATH

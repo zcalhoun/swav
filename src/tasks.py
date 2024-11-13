@@ -19,5 +19,11 @@ class Task:
         elif name == "geonet_1M_checked": 
             self.mean = [0.309, 0.285, 0.227]
             self.std = [0.241, 0.204, 0.199]
+        elif name == "eurosat": 
+            self.mean = [0.3440, 0.3801, 0.4076]
+            self.std = [0.2021, 0.1362, 0.1149]
+        elif name == "ssl4eo":
+            self.mean = [0.4838, 0.4808, 0.4780]
+            self.std = [0.1964, 0.1733, 0.1484]
         else:
             raise NotImplementedError("Task not implemented")

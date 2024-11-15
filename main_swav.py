@@ -440,7 +440,7 @@ def main():
                 "epoch": epoch + 1,
                 "state_dict": model.state_dict(),
                 "optimizer": optimizer.state_dict(),
-                "learning_rate": optimizer.optim.param_groups[0]["lr"]
+                "learning_rate": optimizer.param_groups[0]["lr"]
             }
             #if args.use_fp16:
             #    save_dict["amp"] = apex.amp.state_dict()

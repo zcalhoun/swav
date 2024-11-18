@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DATASET_PATH="/develop/data/0k_251k_uint8_jpeg_tif/rgb#"
+DATASET_PATH="/develop/data/0k_251k_uint8_jpeg_tif/"
 EXPERIMENT_PATH="/develop/results/ssl4eo_from_scratch_400/"
 
 mkdir -p $EXPERIMENT_PATH

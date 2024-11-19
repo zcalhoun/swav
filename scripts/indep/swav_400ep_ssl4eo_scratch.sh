@@ -5,12 +5,12 @@ EXPERIMENT_PATH="/develop/results/ssl4eo_from_scratch_400/"
 
 mkdir -p $EXPERIMENT_PATH
 
-python -m torch.distributed.launch --nproc_per_node=4 main_swav.py \
+python -m torch.distributed.launch --nproc_per_node=8 main_swav.py \
 --data_path $DATASET_PATH \
 --task ssl4eo \
 --initialize_imagenet false \
 --project ssl4e0 \
---workers 64 \
+--workers 20 \
 --nmb_crops 2 6 \
 --size_crops 224 96 \
 --min_scale_crops 0.14 0.05 \
@@ -25,7 +25,7 @@ python -m torch.distributed.launch --nproc_per_node=4 main_swav.py \
 --epoch_queue_starts 15 \
 --epochs 400 \
 --checkpoint_freq 50 \
---batch_size 64 \
+--batch_size 32 \
 --base_lr 0.6 \
 --final_lr 0.0006 \
 --freeze_prototypes_niters 5005 \

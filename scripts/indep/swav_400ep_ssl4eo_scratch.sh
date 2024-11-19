@@ -10,6 +10,7 @@ python -m torch.distributed.launch --nproc_per_node=8 main_swav.py \
 --task ssl4eo \
 --initialize_imagenet false \
 --project ssl4e0 \
+--workers 16 \
 --nmb_crops 2 6 \
 --size_crops 224 96 \
 --min_scale_crops 0.14 0.05 \

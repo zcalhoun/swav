@@ -10,7 +10,7 @@ python -m torch.distributed.launch --nproc_per_node=4 main_swav.py \
 --task ssl4eo \
 --initialize_imagenet false \
 --project ssl4e0 \
---workers 20 \
+--workers 10 \
 --restrict_gpus 0 1 2 3 \
 --nmb_crops 2 6 \
 --size_crops 224 96 \

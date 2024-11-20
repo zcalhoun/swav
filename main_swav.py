@@ -204,6 +204,13 @@ parser.add_argument(
 )
 
 parser.add_argument(
+    "--local-rank",
+    default=0,
+    type=int,
+    help="this argument is not used and should be ignored",
+)
+
+parser.add_argument(
     "--restrict_gpus",
     default=[0, 1, 2, 3, 4, 5, 6, 7],
     type=int,

@@ -259,6 +259,8 @@ parser.add_argument(
 )
 parser.add_argument("--seed", type=int, default=31, help="seed")
 
+parser.add_argument("--wandb", type=bool_flag, default=True, help="Use wandb. Default True")
+
 
 def main():
     global args
@@ -411,15 +413,16 @@ def main():
 
     cudnn.benchmark = True
 
-    wandb.init(project=args.project, entity="bass-connections-22-23")
-    config = {"training size":len(train_dataset),
-              "learning_rate":learning_rate,
-              "weight_decay": args.wd ,
-              "epochs": args.epochs,
-              "batch_size":args.batch_size
-              }
-    wandb.config = config
-    wandb.watch(model, log="all")
+    if args.wandb:
+        wandb.init(project=args.project, entity="bass-connections-22-23")
+        config = {"training size":len(train_dataset),
+                  "learning_rate":learning_rate,
+                  "weight_decay": args.wd ,
+                  "epochs": args.epochs,
+                  "batch_size":args.batch_size
+                  }
+        wandb.config = config
+        wandb.watch(model, log="all")
      
     for epoch in range(start_epoch, args.epochs):
 
@@ -556,11 +559,12 @@ def train(train_loader, model, optimizer, epoch, lr_schedule, queue):
                     lr=optimizer.param_groups[0]["lr"],
                 )
             )
-            wandb.log({
-                "epoch": epoch,
-                "loss": losses.avg,
-                "lr": optimizer.param_groups[0]["lr"]
-            })
+            if args.wandb:
+                wandb.log({
+                    "epoch": epoch,
+                    "loss": losses.avg,
+                    "lr": optimizer.param_groups[0]["lr"]
+                })
     return (epoch, losses.avg), queue
 
 
